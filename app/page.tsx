@@ -3,8 +3,11 @@
 export default function Home() {
   return (
     <main style={{ padding: 40, fontFamily: "Arial" }}>
-      <h1>Discover your ideal career</h1>
-      <p>This test will reveal how your brain actually works.</p>
+      <h1>Discover Your Ideal Career</h1>
+      <p>
+        Answer a few questions and we’ll reveal how your brain works and what
+        career fits you best.
+      </p>
 
       <button
         onClick={() => alert("Test coming soon!")}
