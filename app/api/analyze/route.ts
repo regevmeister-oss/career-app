@@ -1,17 +1,21 @@
 export async function POST(req: Request) {
   const { answers, entry } = await req.json();
 
-  const prompt = `
+ const prompt = `
 You are a world-class career psychologist and AI career advisor.
 
 USER ENTRY STATE:
-${entry}
+${JSON.stringify(body, null, 2)}
 
-USER ANSWERS:
-${JSON.stringify(answers, null, 2)}
+Analyze the user deeply and return:
+1. Personality type
+2. Strengths
+3. Weaknesses
+4. Best career paths
+5. Hidden potential
+6. Unique insight
 
-Analyze deeply and return ONLY valid JSON:
-
+Respond in a powerful, premium, human-like way.
 {
   "identity": "",
   "strengths": [],
