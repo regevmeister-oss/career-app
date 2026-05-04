@@ -33,7 +33,7 @@ Respond in a powerful, premium, human-like way.
 }
 `;
 
-    // זמני — עד שנחבר OpenAI
+    // TEMP MOCK RESPONSE (עד שנחבר AI אמיתי)
     return NextResponse.json({
       identity: "Creative Strategic Thinker",
       strengths: ["Vision", "Creativity", "Independence"],
