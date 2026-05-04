@@ -1,39 +1,39 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 
-export default function ResultPage() {
-  const [result, setResult] = useState("");
+export default function Result() {
+  const [data, setData] = useState<any>(null);
 
   useEffect(() => {
-    const answers = JSON.parse(localStorage.getItem("answers") || "[]");
+    const answers = localStorage.getItem("answers");
 
-    fetch("/api/analyze", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ answers }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setResult(data.result || "No result");
+    if (answers) {
+      fetch("/api/analyze", {
+        method: "POST",
+        body: answers
       })
-      .catch(() => {
-        setResult("Error loading result");
-      });
+        .then(res => res.json())
+        .then(setData);
+    }
   }, []);
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-purple-900 to-black text-white flex items-center justify-center px-6">
-      {!result ? (
-        <p className="animate-pulse text-lg">Analyzing your answers...</p>
-      ) : (
-        <div className="max-w-xl text-center">
-          <h1 className="text-3xl font-bold mb-6">Your Career Insights 🚀</h1>
-          <p className="leading-relaxed">{result}</p>
-        </div>
-      )}
+  if (!data) return <div className="text-white p-10">Analyzing...</div>;
+
+  const isPro = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('success') === 'true';
+
+return (
+    <div className="min-h-screen bg-black text-white p-10 space-y-6">
+      <h1 className="text-4xl">Your Career DNA</h1>
+
+      <p>{data.identity}</p>
+
+      <button
+        onClick={() => location.href="/ai-career/premium"}
+        className="mt-10 px-8 py-4 bg-yellow-400 text-black rounded-full"
+      >
+        Unlock Premium
+      </button>
     </div>
   );
 }

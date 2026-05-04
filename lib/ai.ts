@@ -1,34 +1,40 @@
 ﻿import OpenAI from "openai";
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY!,
 });
 
-export async function generateInsights(answers: any) {
+export async function analyzeAnswers(answers: any) {
   const prompt = `
-You are an expert career advisor.
+You are a world-class career psychologist and NLP expert.
 
-Analyze the user's answers and return:
+Analyze the following user answers deeply.
 
-1. Career Matches (Top 3)
-2. Strengths
-3. Weaknesses
-4. Ideal Work Environment
-5. Action Plan
+Return JSON only in this format:
+{
+  "identity": "",
+  "strengths": [],
+  "weaknesses": [],
+  "idealEnvironment": "",
+  "recommendedCareers": [],
+  "nextSteps": []
+}
 
 User answers:
-${JSON.stringify(answers, null, 2)}
+${JSON.stringify(answers)}
 `;
 
   const response = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      {
-        role: "user",
-        content: prompt,
-      },
-    ],
+    model: "gpt-4.1-mini",
+    messages: [{ role: "user", content: prompt }],
+    temperature: 0.7,
   });
 
-  return response.choices[0].message.content;
+  const text = response.choices[0].message.content || "{}";
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { error: "Failed to parse AI response", raw: text };
+  }
 }

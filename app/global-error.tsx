@@ -1,13 +1,16 @@
-﻿'use client'
-export default function GlobalError({ error, reset }) {
+﻿"use client";
+
+export default function GlobalError({
+  error,
+  reset,
+}: {
+  error: Error;
+  reset: () => void;
+}) {
   return (
-    <html>
-      <body style={{background:'#000',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',flexDirection:'column'}}>
-        <h1>Something broke 😅</h1>
-        <button onClick={reset} style={{marginTop:20,padding:'10px 20px'}}>
-          Try again
-        </button>
-      </body>
-    </html>
-  )
+    <div>
+      <h2>Something went wrong</h2>
+      <button onClick={() => reset()}>Try again</button>
+    </div>
+  );
 }

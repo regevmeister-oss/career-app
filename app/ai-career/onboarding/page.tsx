@@ -1,107 +1,46 @@
-"use client";
+﻿"use client";
 
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-export default function ResultPage() {
-  const [result, setResult] = useState("");
-  const [displayedText, setDisplayedText] = useState("");
-  const [loading, setLoading] = useState(true);
+const questions = [
+  "When do you feel most alive?",
+  "What problems do you enjoy solving?",
+  "What drains your energy?",
+  "If failure was impossible, what would you do?",
+  "Do you prefer structure or freedom?",
+  "People, ideas, or systems?",
+  "Impact or income?",
+  "Best work environment?",
+  "What are you naturally good at?",
+  "Where do you see yourself in 5 years?"
+];
 
-  useEffect(() => {
-    const answers = JSON.parse(localStorage.getItem("answers") || "[]");
+export default function Onboarding() {
+  const [step, setStep] = useState(0);
+  const [answers, setAnswers] = useState<string[]>([]);
+  const router = useRouter();
 
-    async function fetchResult() {
-      const res = await fetch("/api/analyze", {
-        method: "POST",
-        body: JSON.stringify({ answers }),
-      });
+  const handleAnswer = (answer: string) => {
+    const updated = [...answers, answer];
+    setAnswers(updated);
 
-      const data = await res.json();
-      setResult(data.result);
-      setLoading(false);
+    if (step < questions.length - 1) {
+      setStep(step + 1);
+    } else {
+      localStorage.setItem("answers", JSON.stringify(updated));
+      router.push("/ai-career/result");
     }
-
-    fetchResult();
-  }, []);
-
-  // ✨ אפקט כתיבה (Typing כמו GPT)
-  useEffect(() => {
-    if (!result) return;
-
-    let i = 0;
-    const interval = setInterval(() => {
-      setDisplayedText(result.slice(0, i));
-      i++;
-      if (i > result.length) clearInterval(interval);
-    }, 15);
-
-    return () => clearInterval(interval);
-  }, [result]);
+  };
 
   return (
-    <div className="min-h-screen w-full bg-black text-white flex flex-col items-center justify-start px-6 py-20 relative overflow-hidden">
-      
-      {/* 🌊 רקע */}
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage: "url('/bg.jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          opacity: 0.25,
-        }}
-      />
+    <div className="h-screen flex flex-col items-center justify-center bg-black text-white text-center px-6">
+      <h1 className="text-3xl mb-10">{questions[step]}</h1>
 
-      {/* 🧠 כותרת */}
-      <motion.h1
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1 }}
-        className="z-10 text-4xl md:text-5xl font-serif text-center mb-10"
-        style={{
-          color: "black",
-          WebkitTextStroke: "1px gold",
-        }}
-      >
-        Your Personal Career Insight
-      </motion.h1>
-
-      {/* 🤖 כרטיס תוצאה */}
-      <motion.div
-        initial={{ opacity: 0, y: 60 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5, duration: 1 }}
-        className="z-10 w-full max-w-3xl bg-white/10 backdrop-blur-xl rounded-2xl p-8 shadow-2xl border border-white/20"
-      >
-        {loading ? (
-          <div className="text-center text-lg animate-pulse">
-            Analyzing your personality...
-          </div>
-        ) : (
-          <pre className="whitespace-pre-wrap font-sans leading-relaxed text-lg">
-            {displayedText}
-          </pre>
-        )}
-      </motion.div>
-
-      {/* 💰 CTA */}
-      {!loading && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 2 }}
-          className="z-10 mt-10 text-center"
-        >
-          <p className="mb-4 text-lg opacity-80">
-            Want deeper insights and exact career matches?
-          </p>
-
-          <button className="bg-gradient-to-r from-yellow-500 to-pink-500 px-8 py-3 rounded-full text-black font-semibold hover:scale-105 transition">
-            Unlock Full Report 🔓
-          </button>
-        </motion.div>
-      )}
+      <div className="flex gap-6">
+        <button onClick={() => handleAnswer("Yes")} className="border px-6 py-3 rounded-full">Yes</button>
+        <button onClick={() => handleAnswer("No")} className="border px-6 py-3 rounded-full">No</button>
+      </div>
     </div>
   );
 }

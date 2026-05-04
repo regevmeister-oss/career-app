@@ -4,12 +4,22 @@
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
+  url      = "file:./dev.db"
 }
 
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
-  isPro     Boolean  @default(false)
   createdAt DateTime @default(now())
+
+  analyses  Analysis[]
+}
+
+model Analysis {
+  id        String   @id @default(cuid())
+  userId    String
+  result    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
 }

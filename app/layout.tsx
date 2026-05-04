@@ -1,3 +1,5 @@
+﻿import "./globals.css";
+
 export default function RootLayout({
   children,
 }: {
@@ -5,7 +7,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="m-0 p-0">
+      <body
+        style={{
+          backgroundImage: "url('/bg.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          minHeight: "100vh",
+        }}
+      >
         {children}
       </body>
     </html>

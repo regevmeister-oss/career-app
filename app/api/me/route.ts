@@ -1,7 +1,10 @@
-﻿import { NextResponse } from "next/server";
+﻿import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
 
 export async function GET() {
+  const user = await prisma.user.findFirst();
+
   return NextResponse.json({
-    isPro: false, // ׳×׳©׳ ׳” ׳׳₪׳™ DB ׳‘׳”׳׳©׳
+    isPro: user?.isPro || false
   });
 }

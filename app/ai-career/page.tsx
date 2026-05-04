@@ -1,34 +1,34 @@
-"use client";
-
+﻿"use client";
 import { useRouter } from "next/navigation";
 
-export default function AICareerPage() {
+export default function Intro() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col items-start justify-center px-10">
-      
-      {/* DEBUG קטן */}
-      <p className="text-sm opacity-50 mb-4">ROOT WORKING</p>
-
-      {/* כותרת */}
-      <h1 className="text-5xl font-bold mb-6">
-        AI Career Finder 🚀
+    <div className="h-screen flex flex-col items-center justify-center bg-black text-white text-center px-6">
+      <h1 className="text-4xl md:text-5xl font-semibold mb-10">
+        Feeling lost in your career?
       </h1>
 
-      {/* תיאור */}
-      <p className="text-lg mb-8 opacity-80">
-        Discover your perfect career path using AI
+      <p className="mb-10 text-gray-300 max-w-xl">
+        A short journey into your true career alignment.
       </p>
 
-      {/* כפתור */}
-      <button
-        onClick={() => router.push("/ai-career/onboarding")}
-        className="bg-white text-black px-6 py-3 rounded-xl hover:scale-105 transition"
-      >
-        Start Analysis
-      </button>
+      <div className="flex gap-6">
+        <button
+          onClick={() => router.push("/ai-career/onboarding")}
+          className="px-8 py-4 rounded-full bg-white text-black"
+        >
+          Yes
+        </button>
 
+        <button
+          onClick={() => router.push("/ai-career/goodbye")}
+          className="px-8 py-4 rounded-full border border-white"
+        >
+          No
+        </button>
+      </div>
     </div>
   );
 }

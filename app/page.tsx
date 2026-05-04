@@ -1,24 +1,15 @@
-﻿"use client";
-
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+"use client";
 
 export default function Home() {
-  const router = useRouter();
+  const text = Feeling lost? Are you working in a place where you're not truly happy?
 
-  useEffect(() => {
-    const answers = localStorage.getItem("answers");
+If you'd like, we have a short journey for you — a deep dive into your real desires and needs, guiding you toward your true professional path.
 
-    if (answers) {
-      router.push("/result");
-    } else {
-      router.push("/onboarding");
-    }
-  }, []);
+Do you want to begin?;
 
   return (
-    <div className="h-screen flex items-center justify-center bg-black text-white">
-      Loading...
-    </div>
+    <main className="min-h-screen flex items-center justify-center text-white text-center p-10">
+      <h1 className="text-3xl">{text}</h1>
+    </main>
   );
 }
