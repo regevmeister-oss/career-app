@@ -90,3 +90,4 @@ Analyze deeply and return ONLY valid JSON with:
     return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
 }
+
