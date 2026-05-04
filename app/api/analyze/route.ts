@@ -1,13 +1,19 @@
-export async function POST(req: Request) {
-  const { answers, entry } = await req.json();
+import { NextResponse } from "next/server";
 
- const prompt = `
+export async function POST(req: Request) {
+  try {
+    const { answers, entry } = await req.json();
+
+    const prompt = `
 You are a world-class career psychologist and AI career advisor.
 
 USER ENTRY STATE:
-${JSON.stringify(body, null, 2)}
+${entry}
 
-Analyze the user deeply and return:
+USER ANSWERS:
+${JSON.stringify(answers, null, 2)}
+
+Analyze deeply and return ONLY valid JSON with:
 1. Personality type
 2. Strengths
 3. Weaknesses
@@ -16,20 +22,28 @@ Analyze the user deeply and return:
 6. Unique insight
 
 Respond in a powerful, premium, human-like way.
+
 {
   "identity": "",
   "strengths": [],
   "weaknesses": [],
-  "recommendedCareers": [],
-  "nextSteps": []
+  "careers": [],
+  "hiddenPotential": "",
+  "insight": ""
 }
 `;
 
-  return Response.json({
-    identity: "Builder personality",
-    strengths: ["Execution", "Vision"],
-    weaknesses: ["Overthinking"],
-    recommendedCareers: ["Startup", "Product"],
-    nextSteps: ["Start small project"]
-  });
+    // זמני — עד שנחבר OpenAI
+    return NextResponse.json({
+      identity: "Creative Strategic Thinker",
+      strengths: ["Vision", "Creativity", "Independence"],
+      weaknesses: ["Overthinking"],
+      careers: ["Entrepreneur", "Product Manager"],
+      hiddenPotential: "You can build impactful products",
+      insight: "You think differently than most people"
+    });
+
+  } catch (error) {
+    return NextResponse.json({ error: "Failed" }, { status: 500 });
+  }
 }
