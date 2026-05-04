@@ -1,4 +1,5 @@
-﻿import { NextResponse } from "next/server";
+﻿@"
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import OpenAI from "openai";
 
@@ -10,14 +11,14 @@ export async function POST(req: Request) {
   try {
     const { answers, entry } = await req.json();
 
-    const prompt = 
+    const prompt = `
 You are a world-class career psychologist and AI career advisor.
 
 USER ENTRY STATE:
-
+${entry}
 
 USER ANSWERS:
-
+${JSON.stringify(answers, null, 2)}
 
 Analyze deeply and return ONLY valid JSON with:
 1. Personality type
@@ -35,7 +36,7 @@ Analyze deeply and return ONLY valid JSON with:
   "hiddenPotential": "",
   "insight": ""
 }
-;
+`;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -55,8 +56,8 @@ Analyze deeply and return ONLY valid JSON with:
 
     try {
       const clean = text
-        .replace(/`json/g, "")
-        .replace(/`/g, "")
+        .replace(/```json/g, "")
+        .replace(/```/g, "")
         .trim();
 
       parsed = JSON.parse(clean);
@@ -90,3 +91,4 @@ Analyze deeply and return ONLY valid JSON with:
     return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
 }
+"@ | Set-Content .\app\api\analyze\route.ts -Encoding UTF8
