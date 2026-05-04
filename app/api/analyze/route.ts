@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import OpenAI from "openai";
 
@@ -10,14 +10,14 @@ export async function POST(req: Request) {
   try {
     const { answers, entry } = await req.json();
 
-    const prompt = `
+    const prompt = 
 You are a world-class career psychologist and AI career advisor.
 
 USER ENTRY STATE:
-${entry}
+
 
 USER ANSWERS:
-${JSON.stringify(answers, null, 2)}
+
 
 Analyze deeply and return ONLY valid JSON with:
 1. Personality type
@@ -35,13 +35,15 @@ Analyze deeply and return ONLY valid JSON with:
   "hiddenPotential": "",
   "insight": ""
 }
-`;
+;
 
-    // 🔥 קריאה ל-AI
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: "You are an elite career advisor." },
+        {
+          role: "system",
+          content: "Return ONLY valid JSON. No text. No explanation.",
+        },
         { role: "user", content: prompt },
       ],
       temperature: 0.7,
@@ -49,10 +51,28 @@ Analyze deeply and return ONLY valid JSON with:
 
     const text = completion.choices[0].message.content || "{}";
 
-    // 🔥 פרס JSON
-    const parsed = JSON.parse(text);
+    let parsed;
 
-    // 🔥 שמירה ל-DB
+    try {
+      const clean = text
+        .replace(/`json/g, "")
+        .replace(/`/g, "")
+        .trim();
+
+      parsed = JSON.parse(clean);
+    } catch (err) {
+      console.error("JSON PARSE FAILED:", text);
+
+      parsed = {
+        identity: "Unknown",
+        strengths: [],
+        weaknesses: [],
+        careers: [],
+        hiddenPotential: "",
+        insight: "AI response parsing failed",
+      };
+    }
+
     const analysis = await prisma.analysis.create({
       data: {
         userId: "demo-user",
