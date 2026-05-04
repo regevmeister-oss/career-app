@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
   try {
@@ -21,8 +22,6 @@ Analyze deeply and return ONLY valid JSON with:
 5. Hidden potential
 6. Unique insight
 
-Respond in a powerful, premium, human-like way.
-
 {
   "identity": "",
   "strengths": [],
@@ -33,8 +32,15 @@ Respond in a powerful, premium, human-like way.
 }
 `;
 
-    // TEMP MOCK RESPONSE (עד שנחבר AI אמיתי)
+    const analysis = await prisma.analysis.create({
+      data: {
+        userId: "demo-user",
+        result: JSON.stringify({ answers, entry })
+      }
+    });
+
     return NextResponse.json({
+      id: analysis.id,
       identity: "Creative Strategic Thinker",
       strengths: ["Vision", "Creativity", "Independence"],
       weaknesses: ["Overthinking"],
@@ -44,6 +50,7 @@ Respond in a powerful, premium, human-like way.
     });
 
   } catch (error) {
+    console.error(error);
     return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
 }
