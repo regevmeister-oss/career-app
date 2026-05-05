@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState } from 'react'
 
@@ -26,7 +26,7 @@ export default function ResultPage() {
   return (
     <div style={{ padding: 40, background:'#0f172a', color:'white', minHeight:'100vh' }}>
       
-      <h1>🎯 Your Career Result</h1>
+      <h1>?? Your Career Result</h1>
 
       <div style={{ background:'#1e293b', padding:20, borderRadius:12, marginTop:20 }}>
         <h2>{ai.title}</h2>
@@ -38,7 +38,7 @@ export default function ResultPage() {
         <div style={{
           filter: isPro ? 'none' : 'blur(6px)'
         }}>
-          <h2>🔥 Full Career Plan</h2>
+          <h2>?? Full Career Plan</h2>
           <ul>
             {ai.plan.map((p:string,i:number)=>(<li key={i}>{p}</li>))}
           </ul>
@@ -54,7 +54,7 @@ export default function ResultPage() {
             alignItems:'center',
             background:'rgba(0,0,0,0.7)'
           }}>
-            <h2>🔒 Unlock Full Plan</h2>
+            <h2>?? Unlock Full Plan</h2>
             <button onClick={handleUpgrade} style={{
               marginTop:20,
               padding:'12px 24px',
@@ -63,7 +63,7 @@ export default function ResultPage() {
               borderRadius:8,
               fontWeight:'bold'
             }}>
-              Upgrade 🚀
+              Upgrade ??
             </button>
           </div>
         )}
