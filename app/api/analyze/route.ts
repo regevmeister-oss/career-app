@@ -1,6 +1,4 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import OpenAI from "openai";
+﻿import OpenAI from "openai";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
@@ -13,55 +11,31 @@ export async function POST(req: Request) {
     const prompt = `
 You are a world-class career psychologist and AI career advisor.
 
-USER ENTRY STATE:
-${entry}
+Analyze this user deeply.
 
-USER ANSWERS:
-${JSON.stringify(answers, null, 2)}
+Answers:
+${JSON.stringify(answers)}
 
-Analyze deeply and return ONLY valid JSON with:
-1. Personality type
-2. Strengths
-3. Weaknesses
-4. Best career paths
-5. Hidden potential
-6. Unique insight
+Return JSON:
+{
+  "title": "Career title",
+  "summary": "Short explanation",
+  "plan": ["step1", "step2", "step3"]
+}
 `;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: "Return ONLY valid JSON. No text. No explanation." },
-        { role: "user", content: prompt },
-      ],
-      temperature: 0.7,
+      messages: [{ role: "user", content: prompt }],
     });
 
-    const text = completion.choices[0].message.content || "{}";
+    const text = completion.choices[0].message.content;
 
-    let parsed;
-    try {
-      parsed = JSON.parse(text);
-    } catch {
-      parsed = {
-        identity: "Unknown",
-        strengths: [],
-        weaknesses: [],
-        careers: [],
-        hiddenPotential: "",
-        insight: "AI response parsing failed",
-      };
-    }
+    return Response.json(JSON.parse(text!));
 
-    const analysis = await prisma.analysis.create({
-      data: { userId: "demo-user", result: JSON.stringify(parsed) },
-    });
-
-    return NextResponse.json({ id: analysis.id, ...parsed });
-
-  } catch (error) {
-    console.error("ANALYZE ERROR:", error);
-    return NextResponse.json({ error: "Failed" }, { status: 500 });
+  } catch (err) {
+    console.error(err);
+    return Response.json({ error: "AI failed" }, { status: 500 });
   }
 }
 
