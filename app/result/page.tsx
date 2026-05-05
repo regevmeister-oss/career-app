@@ -1,5 +1,6 @@
 ﻿"use client";
 import UpgradeButton from "@/components/UpgradeButton";
+
 import { useEffect, useState } from "react";
 
 export default function ResultPage() {
@@ -38,8 +39,9 @@ export default function ResultPage() {
             <li key={i}>• {s}</li>
           ))}
         </ul>
-      <UpgradeButton />
-<PayButton />
+    <button className="mt-6 px-6 py-3 bg-black text-white rounded-xl">
+  Upgrade (coming soon)
+</button>
 </div>
 
       <div>
