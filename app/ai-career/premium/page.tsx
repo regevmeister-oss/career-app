@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 export default function Premium() {
   return (
@@ -13,3 +13,5 @@ export default function Premium() {
     </div>
   );
 }
+
+

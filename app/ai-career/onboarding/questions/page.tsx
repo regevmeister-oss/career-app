@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { questions } from "@/lib/questions";
@@ -52,3 +52,5 @@ export default function QuestionsPage() {
     </div>
   );
 }
+
+

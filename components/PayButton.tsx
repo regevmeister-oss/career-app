@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 export default function PayButton() {
   const handlePay = async () => {
@@ -19,3 +19,5 @@ export default function PayButton() {
     </button>
   );
 }
+
+

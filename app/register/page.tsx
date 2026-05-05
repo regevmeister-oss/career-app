@@ -1,20 +1,35 @@
-import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcrypt";
-import { NextResponse } from "next/server";
+'use client'
 
-const prisma = new PrismaClient();
+import { signIn } from "next-auth/react"
+import { useState } from "react"
 
-export async function POST(req: Request) {
-  const { email, password } = await req.json();
+export default function RegisterPage() {
+  const [email, setEmail] = useState("")
 
-  const hashed = await bcrypt.hash(password, 10);
-
-  const user = await prisma.user.create({
-    data: {
+  const handleLogin = async () => {
+    await signIn("credentials", {
       email,
-      password: hashed,
-    },
-  });
+      callbackUrl: "/premium"
+    })
+  }
 
-  return NextResponse.json(user);
+  return (
+    <div style={{ padding: 40 }}>
+      <h1>Register / Login</h1>
+
+      <input
+        type="email"
+        placeholder="Enter email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        style={{ padding: 10, marginRight: 10 }}
+      />
+
+      <button onClick={handleLogin}>
+        Continue
+      </button>
+    </div>
+  )
 }
+
+

@@ -1,7 +1,6 @@
-import NextAuth from "next-auth";
+﻿import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 
@@ -10,24 +9,20 @@ const handler = NextAuth({
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: {},
-        password: {},
+        email: { label: "Email", type: "text" },
       },
       async authorize(credentials) {
-        if (!credentials) return null;
+        if (!credentials?.email) return null;
 
-        const user = await prisma.user.findUnique({
+        let user = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
 
-        if (!user) return null;
-
-        const isValid = await bcrypt.compare(
-          credentials.password,
-          user.password
-        );
-
-        if (!isValid) return null;
+        if (!user) {
+          user = await prisma.user.create({
+            data: { email: credentials.email },
+          });
+        }
 
         return {
           id: user.id,
@@ -37,18 +32,27 @@ const handler = NextAuth({
       },
     }),
   ],
+
   callbacks: {
-    async session({ session, token }) {
-      session.user.id = token.sub!;
-      session.user.isPro = token.isPro as boolean;
-      return session;
-    },
     async jwt({ token, user }) {
       if (user) {
+        token.id = user.id;
         token.isPro = (user as any).isPro;
       }
       return token;
     },
+
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.isPro = token.isPro as boolean;
+      }
+      return session;
+    },
+  },
+
+  session: {
+    strategy: "jwt",
   },
 });
 

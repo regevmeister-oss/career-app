@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import OpenAI from 'openai'
 
 const openai = new OpenAI({
@@ -28,3 +28,5 @@ Make it feel like a personal AI analysis.
     text: response.choices[0].message.content,
   })
 }
+
+

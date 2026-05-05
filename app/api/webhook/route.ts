@@ -1,19 +1,12 @@
-﻿import Stripe from "stripe";
+import Stripe from "stripe";
 import { headers } from "next/headers";
-import { PrismaClient } from "@prisma/client";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-const prisma = new PrismaClient();
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
   const body = await req.text();
   const sig = headers().get("stripe-signature")!;
+
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
   let event;
 
@@ -27,19 +20,18 @@ export async function POST(req: Request) {
     return new Response("Webhook Error", { status: 400 });
   }
 
-  // 💥 כאן הקסם
   if (event.type === "checkout.session.completed") {
-    const session = event.data.object as Stripe.Checkout.Session;
+    const session = event.data.object as any;
 
-    const email = session.customer_email;
+    const email = session.customer_details.email;
 
-    if (email) {
-      await prisma.user.update({
-        where: { email },
-        data: { isPro: true },
-      });
-    }
+    await prisma.user.update({
+      where: { email },
+      data: { isPro: true },
+    });
   }
 
   return new Response("OK");
 }
+
+

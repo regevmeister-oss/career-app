@@ -1,4 +1,4 @@
-﻿type Props = {
+type Props = {
   question: string;
   options: string[];
   onSelect: (value: string) => void;
@@ -17,3 +17,5 @@ export default function QuestionCard({ question, options, onSelect }: Props) {
     </div>
   );
 }
+
+

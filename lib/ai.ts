@@ -1,4 +1,4 @@
-﻿import OpenAI from "openai";
+import OpenAI from "openai";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
@@ -38,3 +38,5 @@ ${JSON.stringify(answers)}
     return { error: "Failed to parse AI response", raw: text };
   }
 }
+
+

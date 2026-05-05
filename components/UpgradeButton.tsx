@@ -1,7 +1,13 @@
-﻿"use client";
+"use client";
+
+import { useState } from "react";
 
 export default function UpgradeButton() {
-  const handleClick = async () => {
+  const [loading, setLoading] = useState(false);
+
+  const handleUpgrade = async () => {
+    setLoading(true);
+
     const res = await fetch("/api/checkout", {
       method: "POST",
     });
@@ -10,15 +16,20 @@ export default function UpgradeButton() {
 
     if (data.url) {
       window.location.href = data.url;
+    } else {
+      alert("Payment failed");
+      setLoading(false);
     }
   };
 
   return (
     <button
-      onClick={handleClick}
-      className="mt-6 px-6 py-3 bg-black text-white rounded-xl hover:opacity-80 transition"
+      onClick={handleUpgrade}
+      className="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-xl font-bold"
     >
-      Upgrade to PRO 🚀
+      {loading ? "Redirecting..." : "Upgrade to PRO ??"}
     </button>
   );
 }
+
+

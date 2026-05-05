@@ -1,5 +1,5 @@
-{
-  "compilerOptions": {
+﻿{
+  "compilerOptions": {`n    "typeRoots": ["./types", "./node_modules/@types"],
     "target": "ES2020",
     "lib": [
       "dom",

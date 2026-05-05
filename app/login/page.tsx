@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { signIn } from "next-auth/react";
 import { useState } from "react";
@@ -27,3 +27,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
+

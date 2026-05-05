@@ -1,58 +1,42 @@
-﻿import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+﻿import OpenAI from "openai";
+import { NextResponse } from "next/server";
 
-export async function POST(req: Request) {
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+export async function POST() {
   try {
-    const { answers, entry } = await req.json();
-
-    const prompt = `
-You are a world-class career psychologist and AI career advisor.
-
-USER ENTRY STATE:
-${entry}
-
-USER ANSWERS:
-${JSON.stringify(answers, null, 2)}
-
-Analyze deeply and return ONLY valid JSON with:
-1. Personality type
-2. Strengths
-3. Weaknesses
-4. Best career paths
-5. Hidden potential
-6. Unique insight
-
-{
-  "identity": "",
-  "strengths": [],
-  "weaknesses": [],
-  "careers": [],
-  "hiddenPotential": "",
-  "insight": ""
-}
-`;
-
-    // 🔥 שמירה ל־DB
-    const analysis = await prisma.analysis.create({
-      data: {
-        userId: "demo-user",
-        result: JSON.stringify({ answers, entry })
-      }
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: "You are a career advisor AI. Give structured career guidance."
+        },
+        {
+          role: "user",
+          content: "Give a career path with title, summary and 5 steps."
+        }
+      ],
+      temperature: 0.7,
     });
 
-    // 🔥 תגובה זמנית (עד חיבור AI)
+    const text = completion.choices[0].message.content;
+
     return NextResponse.json({
-      id: analysis.id,
-      identity: "Creative Strategic Thinker",
-      strengths: ["Vision", "Creativity", "Independence"],
-      weaknesses: ["Overthinking"],
-      careers: ["Entrepreneur", "Product Manager"],
-      hiddenPotential: "You can build impactful products",
-      insight: "You think differently than most people"
+      title: "AI Career Result",
+      summary: text,
+      plan: [
+        "Step 1",
+        "Step 2",
+        "Step 3",
+        "Step 4",
+        "Step 5"
+      ]
     });
 
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: "Failed" }, { status: 500 });
+  } catch (e:any) {
+    return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }

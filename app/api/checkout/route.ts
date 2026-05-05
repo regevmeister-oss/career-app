@@ -1,22 +1,26 @@
-﻿const session = await stripe.checkout.sessions.create({
-  payment_method_types: ["card"],
-  mode: "payment",
+import Stripe from "stripe";
+import { NextResponse } from "next/server";
 
-  customer_email: user.email, 
+export async function POST() {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-  line_items: [
-    {
-      price_data: {
-        currency: "usd",
-        product_data: {
-          name: "IGUIDE PRO",
+  const session = await stripe.checkout.sessions.create({
+    mode: "payment",
+    line_items: [
+      {
+        price_data: {
+          currency: "usd",
+          product_data: { name: "IGUIDE PRO" },
+          unit_amount: 1000,
         },
-        unit_amount: 1000,
+        quantity: 1,
       },
-      quantity: 1,
-    },
-  ],
+    ],
+    success_url: "http://localhost:3000/success",
+    cancel_url: "http://localhost:3000/cancel",
+  });
 
-  success_url: `${process.env.NEXT_PUBLIC_URL}/success`,
-  cancel_url: `${process.env.NEXT_PUBLIC_URL}/cancel`,
-});
+  return NextResponse.json({ url: session.url });
+}
+
+

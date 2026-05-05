@@ -1,4 +1,4 @@
-﻿export const questions = [
+export const questions = [
   "What motivates you to wake up in the morning?",
   "Do you prefer stability or risk?",
   "Do you enjoy working with people or alone?",
@@ -10,3 +10,5 @@
   "What type of problems excite you?",
   "Where do you see yourself in 5 years?"
 ];
+
+

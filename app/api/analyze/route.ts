@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import OpenAI from "openai";
 
@@ -64,3 +64,5 @@ Analyze deeply and return ONLY valid JSON with:
     return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
 }
+
+

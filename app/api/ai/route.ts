@@ -1,4 +1,4 @@
-﻿import OpenAI from "openai"
+import OpenAI from "openai"
 import { NextResponse } from "next/server"
 
 const openai = new OpenAI({
@@ -32,3 +32,5 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "AI failed" }, { status: 500 })
   }
 }
+
+
