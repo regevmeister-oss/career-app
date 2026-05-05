@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "../../../lib/prisma";
+import { prisma } from "@/lib/prisma";
 import OpenAI from "openai";
 
 const openai = new OpenAI({
@@ -64,6 +64,7 @@ Analyze deeply and return ONLY valid JSON with:
     return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
 }
+
 
 
 

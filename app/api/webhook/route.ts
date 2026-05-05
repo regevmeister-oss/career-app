@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 import { headers } from "next/headers";
-import { prisma } from "../../../lib/prisma";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
   const body = await req.text();
@@ -33,6 +33,7 @@ export async function POST(req: Request) {
 
   return new Response("OK");
 }
+
 
 
 
