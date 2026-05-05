@@ -1,16 +1,24 @@
 ﻿"use client";
 
-import { useRouter } from "next/navigation";
-
 export default function UpgradeButton() {
-  const router = useRouter();
+  const handleClick = async () => {
+    const res = await fetch("/api/checkout", {
+      method: "POST",
+    });
+
+    const data = await res.json();
+
+    if (data.url) {
+      window.location.href = data.url;
+    }
+  };
 
   return (
     <button
-      onClick={() => router.push("/premium")}
-      className="bg-yellow-500 px-6 py-3 rounded-xl text-black font-bold mt-6"
+      onClick={handleClick}
+      className="mt-6 px-6 py-3 bg-black text-white rounded-xl hover:opacity-80 transition"
     >
-      Unlock Premium Analysis
+      Upgrade to PRO 🚀
     </button>
   );
 }
