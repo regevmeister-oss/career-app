@@ -1,34 +1,45 @@
 ﻿import Stripe from "stripe";
-import { headers } from "next/headers";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
-export async function POST(req: Request) {
-  const body = await req.text();
-  const signature = (await headers()).get("stripe-signature")!;
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-apiVersion: "2023-10-16",
-  });
+export async function POST(req: NextRequest) {
+  const body = await req.text()
+  const sig = req.headers.get("stripe-signature") as string;
 
-  let event;
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+
+  let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
-    );
-  } catch (err) {
-    console.error("❌ Webhook error:", err);
-    return new NextResponse("Webhook error", { status: 400 });
+    event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
+  } catch (err: any) {
+    console.error("❌ Webhook signature verification failed.", err.message);
+    return new NextResponse("Webhook Error", { status: 400 });
   }
 
-  if (event.type === "checkout.session.completed") {
-    const session = event.data.object as Stripe.Checkout.Session;
 
-    console.log("🔥 PRO USER:", session.metadata?.userId);
+  switch (event.type) {
+    case "checkout.session.completed":
+      const session = event.data.object as Stripe.Checkout.Session;
+
+      console.log("✅ Payment successful:", session.id);
+
+      // await prisma.user.update({
+      //   where: { email: session.customer_email! },
+      //   data: { isPro: true }
+      // });
+
+      break;
+
+    case "payment_intent.succeeded":
+      console.log("💰 Payment intent succeeded");
+      break;
+
+    default:
+      console.log(`ℹ️ Unhandled event type: ${event.type}`);
   }
 
   return NextResponse.json({ received: true });
