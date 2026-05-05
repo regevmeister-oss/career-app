@@ -26,28 +26,13 @@ Analyze deeply and return ONLY valid JSON with:
 4. Best career paths
 5. Hidden potential
 6. Unique insight
-
-{
-  "identity": "",
-  "strengths": [],
-  "weaknesses": [],
-  "careers": [],
-  "hiddenPotential": "",
-  "insight": ""
-}
 `;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
-        {
-          role: "system",
-          content: "Return ONLY valid JSON. No text. No explanation.",
-        },
-        {
-          role: "user",
-          content: prompt,
-        },
+        { role: "system", content: "Return ONLY valid JSON. No text. No explanation." },
+        { role: "user", content: prompt },
       ],
       temperature: 0.7,
     });
@@ -55,17 +40,9 @@ Analyze deeply and return ONLY valid JSON with:
     const text = completion.choices[0].message.content || "{}";
 
     let parsed;
-
     try {
-      const clean = text
-        .replace(/```json/g, "")
-        .replace(/```/g, "")
-        .trim();
-
-      parsed = JSON.parse(clean);
-    } catch (err) {
-      console.error("JSON PARSE FAILED:", text);
-
+      parsed = JSON.parse(text);
+    } catch {
       parsed = {
         identity: "Unknown",
         strengths: [],
@@ -77,16 +54,10 @@ Analyze deeply and return ONLY valid JSON with:
     }
 
     const analysis = await prisma.analysis.create({
-      data: {
-        userId: "demo-user",
-        result: JSON.stringify(parsed),
-      },
+      data: { userId: "demo-user", result: JSON.stringify(parsed) },
     });
 
-    return NextResponse.json({
-      id: analysis.id,
-      ...parsed,
-    });
+    return NextResponse.json({ id: analysis.id, ...parsed });
 
   } catch (error) {
     console.error("ANALYZE ERROR:", error);

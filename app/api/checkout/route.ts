@@ -1,31 +1,44 @@
 ﻿import Stripe from "stripe";
 import { NextResponse } from "next/server";
 
-export async function POST() {
-  try {
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-      apiVersion: "2024-06-20",
-    });
+export const runtime = "nodejs";
 
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      line_items: [
-        {
-          price: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID!,
-          quantity: 1,
+async function createCheckout() {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: "2023-10-16",
+  });
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    mode: "payment",
+    line_items: [
+      {
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: "IGUIDE PRO",
+          },
+          unit_amount: 999,
         },
-      ],
-      success_url: `${process.env.NEXTAUTH_URL}/success`,
-      cancel_url: `${process.env.NEXTAUTH_URL}/result`,
-    });
+        quantity: 1,
+      },
+    ],
+    success_url: "http://localhost:3000/success",
+    cancel_url: "http://localhost:3000/cancel",
+    metadata: {
+      userId: "user_123",
+    },
+  });
 
-    return NextResponse.json({ url: session.url });
+  return session.url;
+}
 
-  } catch (error) {
-    console.error("Stripe error:", error);
-    return NextResponse.json(
-      { error: "Stripe session failed" },
-      { status: 500 }
-    );
-  }
+export async function POST() {
+  const url = await createCheckout();
+  return NextResponse.json({ url });
+}
+
+export async function GET() {
+  const url = await createCheckout();
+  return NextResponse.redirect(url!);
 }
