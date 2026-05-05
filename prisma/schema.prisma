@@ -12,3 +12,9 @@ model User {
   email    String  @unique
   isPro    Boolean @default(false)
 }
+model Analysis {
+  id        String   @id @default(cuid())
+  userId    String
+  result    String
+  createdAt DateTime @default(now())
+}
