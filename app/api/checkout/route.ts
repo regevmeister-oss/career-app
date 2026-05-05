@@ -14,6 +14,10 @@ export async function POST() {
 
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
+    // 👇 זה התיקון החשוב לפרודקשן
+    const baseUrl =
+      process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
@@ -29,8 +33,8 @@ export async function POST() {
           quantity: 1,
         },
       ],
-      success_url: "http://localhost:3000/success",
-      cancel_url: "http://localhost:3000/cancel",
+      success_url: `${baseUrl}/success`,
+      cancel_url: `${baseUrl}/cancel`,
     });
 
     return NextResponse.json({ url: session.url });
