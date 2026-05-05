@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 
@@ -51,7 +51,7 @@ function PayButton() {
       onClick={handleCheckout}
       className="bg-green-500 px-6 py-3 rounded text-black font-bold hover:bg-green-400 transition"
     >
-      Upgrade to PRO 🚀
+      Upgrade to PRO ??
     </button>
   );
 }
