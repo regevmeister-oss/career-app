@@ -1,5 +1,5 @@
 ﻿"use client";
-
+import UpgradeButton from "@/components/UpgradeButton";
 import { useEffect, useState } from "react";
 
 export default function ResultPage() {
