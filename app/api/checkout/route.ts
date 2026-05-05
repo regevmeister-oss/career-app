@@ -1,48 +1,22 @@
-﻿import Stripe from "stripe";
-import { NextResponse } from "next/server";
+﻿const session = await stripe.checkout.sessions.create({
+  payment_method_types: ["card"],
+  mode: "payment",
 
-export const runtime = "nodejs";
+  customer_email: user.email, 
 
-export async function POST() {
-  try {
-    if (!process.env.STRIPE_SECRET_KEY) {
-      return NextResponse.json(
-        { error: "Missing STRIPE_SECRET_KEY" },
-        { status: 500 }
-      );
-    }
-
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
-    // 👇 זה התיקון החשוב לפרודקשן
-    const baseUrl =
-      process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      mode: "payment",
-      line_items: [
-        {
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: "IGUIDE PRO",
-            },
-            unit_amount: 1000, // $10
-          },
-          quantity: 1,
+  line_items: [
+    {
+      price_data: {
+        currency: "usd",
+        product_data: {
+          name: "IGUIDE PRO",
         },
-      ],
-      success_url: `${baseUrl}/success`,
-      cancel_url: `${baseUrl}/cancel`,
-    });
+        unit_amount: 1000,
+      },
+      quantity: 1,
+    },
+  ],
 
-    return NextResponse.json({ url: session.url });
-  } catch (err: any) {
-    console.error("Stripe error:", err);
-    return NextResponse.json(
-      { error: err.message || "Something went wrong" },
-      { status: 500 }
-    );
-  }
-}
+  success_url: `${process.env.NEXT_PUBLIC_URL}/success`,
+  cancel_url: `${process.env.NEXT_PUBLIC_URL}/cancel`,
+});

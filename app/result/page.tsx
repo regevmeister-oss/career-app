@@ -1,61 +1,57 @@
 ﻿"use client";
-import UpgradeButton from "@/components/UpgradeButton";
 
 import { useEffect, useState } from "react";
 
 export default function ResultPage() {
-  const [data, setData] = useState<any>(null);
+  const [answers, setAnswers] = useState<string[]>([]);
 
   useEffect(() => {
-    const stored = localStorage.getItem("analysis");
-    if (stored) setData(JSON.parse(stored));
+    const stored = localStorage.getItem("answers");
+    if (stored) {
+      setAnswers(JSON.parse(stored));
+    }
   }, []);
 
-  if (!data) return <div className="text-white p-10">Loading...</div>;
+  return (
+    <div className="min-h-screen bg-black text-white p-10">
+      <h1 className="text-3xl font-bold mb-6">Your Results</h1>
+
+      <ul className="space-y-2 mb-8">
+        {answers.map((a, i) => (
+          <li key={i} className="bg-white/10 p-3 rounded">
+            {a}
+          </li>
+        ))}
+      </ul>
+
+
+      <PayButton />
+    </div>
+  );
+}
+
+/* =========================
+   PAY BUTTON (Stripe)
+========================= */
+function PayButton() {
+  const handleCheckout = async () => {
+    const res = await fetch("/api/checkout", {
+      method: "POST",
+    });
+
+    const data = await res.json();
+
+    if (data.url) {
+      window.location.href = data.url;
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-black text-white p-10 space-y-8">
-      <h1 className="text-5xl text-center text-yellow-400">
-        Your Career DNA
-      </h1>
-
-      <p className="text-xl text-center">{data.identity}</p>
-
-      <div>
-        <h2 className="text-2xl text-yellow-400">Strengths</h2>
-        <ul>
-          {data.strengths?.map((s: string, i: number) => (
-            <li key={i}>• {s}</li>
-          ))}
-        </ul>
-      <UpgradeButton />
-<PayButton />
-</div>
-
-      <div>
-        <h2 className="text-2xl text-yellow-400">Careers</h2>
-        <ul>
-          {data.recommendedCareers?.map((s: string, i: number) => (
-            <li key={i}>• {s}</li>
-          ))}
-        </ul>
-    <button className="mt-6 px-6 py-3 bg-black text-white rounded-xl">
-  Upgrade (coming soon)
-</button>
-</div>
-
-      <div>
-        <h2 className="text-2xl text-yellow-400">Next Steps</h2>
-        <ul>
-          {data.nextSteps?.map((s: string, i: number) => (
-            <li key={i}>• {s}</li>
-          ))}
-        </ul>
-      <UpgradeButton />
-<PayButton />
-</div>
-    <UpgradeButton />
-<PayButton />
-</div>
+    <button
+      onClick={handleCheckout}
+      className="bg-green-500 px-6 py-3 rounded text-black font-bold hover:bg-green-400 transition"
+    >
+      Upgrade to PRO 🚀
+    </button>
   );
 }

@@ -1,46 +1,45 @@
 ﻿import Stripe from "stripe";
-import { NextRequest, NextResponse } from "next/server";
-
-export const runtime = "nodejs";
+import { headers } from "next/headers";
+import { PrismaClient } from "@prisma/client";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const prisma = new PrismaClient();
 
-export async function POST(req: NextRequest) {
-  const body = await req.text()
-  const sig = req.headers.get("stripe-signature") as string;
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+export async function POST(req: Request) {
+  const body = await req.text();
+  const sig = headers().get("stripe-signature")!;
 
-  let event: Stripe.Event;
+  let event;
 
   try {
-    event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
-  } catch (err: any) {
-    console.error("❌ Webhook signature verification failed.", err.message);
-    return new NextResponse("Webhook Error", { status: 400 });
+    event = stripe.webhooks.constructEvent(
+      body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET!
+    );
+  } catch (err) {
+    return new Response("Webhook Error", { status: 400 });
   }
 
+  // 💥 כאן הקסם
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object as Stripe.Checkout.Session;
 
-  switch (event.type) {
-    case "checkout.session.completed":
-      const session = event.data.object as Stripe.Checkout.Session;
+    const email = session.customer_email;
 
-      console.log("✅ Payment successful:", session.id);
-
-      // await prisma.user.update({
-      //   where: { email: session.customer_email! },
-      //   data: { isPro: true }
-      // });
-
-      break;
-
-    case "payment_intent.succeeded":
-      console.log("💰 Payment intent succeeded");
-      break;
-
-    default:
-      console.log(`ℹ️ Unhandled event type: ${event.type}`);
+    if (email) {
+      await prisma.user.update({
+        where: { email },
+        data: { isPro: true },
+      });
+    }
   }
 
-  return NextResponse.json({ received: true });
+  return new Response("OK");
 }
