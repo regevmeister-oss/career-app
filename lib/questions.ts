@@ -4,3 +4,4 @@ export const questions = [
   "Do you like working with people?",
   "Do you prefer stability or growth?",
 ];
+
