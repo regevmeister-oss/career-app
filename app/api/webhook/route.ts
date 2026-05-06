@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
   const body = await req.text();
-  const sig = headers().get("stripe-signature")!;
+  const sig = (await headers()).get("stripe-signature")!;
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
