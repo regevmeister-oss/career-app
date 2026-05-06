@@ -16,28 +16,36 @@ export default function ResultPage() {
       .then(setData);
   }, []);
 
-  if (!data) return <div className="text-white p-10">Analyzing your future...</div>;
+  if (!data) return <div className="text-white p-10">Analyzing...</div>;
 
   return (
     <main className="min-h-screen bg-black text-white p-10">
       <h1 className="text-4xl font-bold mb-6">{data.personality}</h1>
 
-      <p className="mb-6 text-lg opacity-80">{data.message}</p>
+      <p className="mb-6">{data.message}</p>
 
+      {/* FREE PART */}
       <div className="mb-6">
-        <h2 className="text-2xl mb-2">Strengths</h2>
+        <h2 className="text-2xl">Strengths</h2>
         <ul>{data.strengths.map((s:any,i:number)=><li key={i}>✔ {s}</li>)}</ul>
       </div>
 
-      <div className="mb-6">
-        <h2 className="text-2xl mb-2">Weaknesses</h2>
-        <ul>{data.weaknesses.map((w:any,i:number)=><li key={i}>⚠ {w}</li>)}</ul>
-      </div>
-
-      <div>
-        <h2 className="text-2xl mb-2">Recommended Careers</h2>
+      {/* LOCKED PART */}
+      <div className="opacity-40 blur-sm">
+        <h2 className="text-2xl">Careers</h2>
         <ul>{data.careers.map((c:any,i:number)=><li key={i}>💼 {c}</li>)}</ul>
       </div>
+
+      <button
+        onClick={async () => {
+          const res = await fetch("/api/checkout", { method: "POST" });
+          const data = await res.json();
+          window.location.href = data.url;
+        }}
+        className="mt-10 px-6 py-3 bg-yellow-400 text-black rounded-xl"
+      >
+        Unlock Full Career Path 🚀
+      </button>
     </main>
   );
 }
