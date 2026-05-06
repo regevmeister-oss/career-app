@@ -1,36 +1,62 @@
-import OpenAI from "openai"
-import { NextResponse } from "next/server"
+"use client";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-})
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-export async function POST(req: Request) {
-  try {
-    const { answers } = await req.json()
+export default function ResultPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: "You are a premium career advisor. Be insightful and inspiring."
-        },
-        {
-          role: "user",
-          content: "User answers: " + answers.join(", ")
-        }
-      ],
-      temperature: 0.7
-    })
+  const [result, setResult] = useState<string | null>(null);
 
-    return NextResponse.json({
-      result: response.choices[0].message.content
-    })
+  useEffect(() => {
+    if (status === "loading") return;
 
-  } catch (e) {
-    return NextResponse.json({ error: "AI failed" }, { status: 500 })
+    if (!session) {
+      router.push("/login");
+      return;
+    }
+
+    if (!session.user.isPro) {
+      router.push("/premium");
+      return;
+    }
+
+    generateResult();
+  }, [session, status]);
+
+  const generateResult = async () => {
+    const res = await fetch("/api/analysis", {
+      method: "POST",
+      body: JSON.stringify({
+        answers: JSON.parse(localStorage.getItem("answers") || "[]"),
+      }),
+    });
+
+    const data = await res.json();
+    setResult(data.result);
+  };
+
+  if (!result) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+        Generating your AI career path...
+      </div>
+    );
   }
+
+  return (
+    <div className="min-h-screen bg-black text-white p-10">
+      <h1 className="text-4xl text-yellow-400 mb-6">
+        Your AI Career Path 🚀
+      </h1>
+
+      <div className="bg-gray-900 p-6 rounded-xl whitespace-pre-line">
+        {result}
+      </div>
+    </div>
+  );
 }
 
 

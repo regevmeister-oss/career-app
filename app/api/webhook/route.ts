@@ -22,9 +22,9 @@ export async function POST(req: Request) {
     return new Response("Webhook Error", { status: 400 });
   }
 
-  // 🎯 תשלום הצליח
+  // 💥 כאן הקסם
   if (event.type === "checkout.session.completed") {
-    const session = event.data.object as Stripe.Checkout.Session;
+    const session = event.data.object as any;
 
     const userId = session.metadata?.userId;
 
@@ -36,5 +36,5 @@ export async function POST(req: Request) {
     }
   }
 
-  return new Response("OK", { status: 200 });
+  return new Response("OK");
 }

@@ -1,59 +1,21 @@
-"use client";
+import { prisma } from "@/lib/prisma";
+import bcrypt from "bcrypt";
+import { NextResponse } from "next/server";
 
-import { useState } from "react";
+export async function POST(req: Request) {
+  const { email, password } = await req.json();
 
-export default function RegisterPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const hashed = await bcrypt.hash(password, 10);
 
-  const handleRegister = async () => {
-    await fetch("/api/register", {
-      method: "POST",
-      body: JSON.stringify({ email, password }),
-    });
+  const user = await prisma.user.create({
+    data: {
+      email,
+      password: hashed,
+    },
+  });
 
-    window.location.href = "/login";
-  };
-
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white">
-      <input
-        placeholder="Email"
-        onChange={(e) => setEmail(e.target.value)}
-        className="mb-3 p-2 text-black"
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        onChange={(e) => setPassword(e.target.value)}
-        className="mb-3 p-2 text-black"
-      />
-      <button onClick={handleRegister} className="bg-green-400 px-4 py-2 text-black">
-        Register
-      </button>
-    </div>
-  );
+  return NextResponse.json(user);
 }
-
-  return (
-    <div style={{ padding: 40 }}>
-      <h1>Register / Login</h1>
-
-      <input
-        type="email"
-        placeholder="Enter email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        style={{ padding: 10, marginRight: 10 }}
-      />
-
-      <button onClick={handleLogin}>
-        Continue
-      </button>
-    </div>
-  )
-}
-
 
 
 

@@ -19,24 +19,23 @@ export async function POST(req: Request) {
           product_data: {
             name: "IGUIDE PRO",
           },
-          unit_amount: 1000,
+          unit_amount: 2000,
         },
         quantity: 1,
       },
     ],
 
+    // 🔥 זה החיבור למשתמש
     metadata: {
-      userId, // 🔥 חשוב
+      userId,
     },
 
-    success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success`,
-    cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/premium`,
+    success_url: "https://iguide.tech/success",
+    cancel_url: "https://iguide.tech/cancel",
   });
 
   return NextResponse.json({ url: session.url });
 }
-
-
 
 
 

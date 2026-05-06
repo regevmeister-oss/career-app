@@ -1,32 +1,77 @@
-'use client'
-import { useEffect, useState } from 'react'
+import NextAuth from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { prisma } from "@/lib/prisma";
+import bcrypt from "bcrypt";
 
-export default function Dashboard() {
-  const [data, setData] = useState<any[]>([])
+const handler = NextAuth({
+  providers: [
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: {},
+        password: {},
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Missing credentials");
+        }
 
-  useEffect(() => {
-    fetch('/api/analysis/all')
-      .then(res => res.json())
-      .then(setData)
-  }, [])
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email },
+        });
 
-  return (
-    <div className="min-h-screen bg-black text-white p-10">
-      <h1 className="text-3xl mb-6">Your Analyses</h1>
+        if (!user) {
+          throw new Error("User not found");
+        }
 
-      {data.map((item, i) => {
-        const result = JSON.parse(item.result)
+        const isValid = await bcrypt.compare(
+          credentials.password,
+          user.password
+        );
 
-        return (
-          <div key={i} className="mb-6 p-4 border border-gray-700 rounded">
-            <p><b>Identity:</b> {result.identity}</p>
-            <p><b>Careers:</b> {result.recommendedCareers?.join(', ')}</p>
-          </div>
-        )
-      })}
-    </div>
-  )
-}
+        if (!isValid) {
+          throw new Error("Wrong password");
+        }
+
+        return {
+          id: user.id,
+          email: user.email,
+          isPro: user.isPro,
+        };
+      },
+    }),
+  ],
+
+  session: {
+    strategy: "jwt",
+  },
+
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.isPro = user.isPro;
+      }
+      return token;
+    },
+
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.isPro = token.isPro as boolean;
+      }
+      return session;
+    },
+  },
+
+  pages: {
+    signIn: "/login",
+  },
+
+  secret: process.env.NEXTAUTH_SECRET,
+});
+
+export { handler as GET, handler as POST };
 
 
 

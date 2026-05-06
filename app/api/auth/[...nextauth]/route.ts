@@ -7,53 +7,28 @@ const handler = NextAuth({
   providers: [
     CredentialsProvider({
       name: "Credentials",
-      credentials: {
-        email: {},
-        password: {},
-      },
-      async authorize(credentials) {
+      credentials: {},
+      async authorize(credentials: any) {
         const user = await prisma.user.findUnique({
-          where: { email: credentials?.email },
+          where: { email: credentials.email },
         });
 
-        if (!user) throw new Error("User not found");
+        if (!user) return null;
 
-        const isValid = await bcrypt.compare(
-          credentials!.password,
+        const valid = await bcrypt.compare(
+          credentials.password,
           user.password
         );
 
-        if (!isValid) throw new Error("Wrong password");
+        if (!valid) return null;
 
-        return {
-          id: user.id,
-          email: user.email,
-          isPro: user.isPro,
-        };
+        return user;
       },
     }),
   ],
-
   session: {
     strategy: "jwt",
   },
-
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.isPro = user.isPro;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      session.user.id = token.id as string;
-      session.user.isPro = token.isPro as boolean;
-      return session;
-    },
-  },
-
-  secret: process.env.NEXTAUTH_SECRET,
 });
 
 export { handler as GET, handler as POST };
