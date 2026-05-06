@@ -5,30 +5,32 @@ import { useState } from "react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = async () => {
+    await signIn("credentials", {
+      email,
+      password,
+      callbackUrl: "/",
+    });
+  };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center text-white">
-      <h1 className="text-4xl mb-6">Login</h1>
-
+    <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white">
       <input
-        type="email"
-        placeholder="Enter your email"
-        value={email}
+        placeholder="Email"
         onChange={(e) => setEmail(e.target.value)}
-        className="p-3 rounded text-black mb-4"
+        className="mb-3 p-2 text-black"
       />
-
-      <button
-        onClick={() => signIn("credentials", { email, callbackUrl: "/result" })}
-        className="bg-yellow-500 px-6 py-3 rounded-xl text-black font-bold"
-      >
-        Continue
+      <input
+        type="password"
+        placeholder="Password"
+        onChange={(e) => setPassword(e.target.value)}
+        className="mb-3 p-2 text-black"
+      />
+      <button onClick={handleLogin} className="bg-yellow-400 px-4 py-2 text-black">
+        Login
       </button>
     </div>
   );
 }
-
-
-
-
-

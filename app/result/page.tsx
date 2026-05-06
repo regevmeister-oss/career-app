@@ -1,76 +1,44 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from "react";
 
 export default function ResultPage() {
-  const [isPro, setIsPro] = useState(false)
-  const [ai, setAi] = useState<any>(null)
+  const [result, setResult] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const pro = localStorage.getItem('isPro')
-    if (pro === 'true') setIsPro(true)
+    const answers = JSON.parse(localStorage.getItem("answers") || "{}");
 
-    fetch('/api/analysis', { method: 'POST' })
-      .then(res => res.json())
-      .then(setAi)
-  }, [])
+    fetch("/api/analysis", {
+      method: "POST",
+      body: JSON.stringify({ answers }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setResult(data.result);
+        setLoading(false);
+      });
+  }, []);
 
-  const handleUpgrade = async () => {
-    const res = await fetch('/api/checkout', { method: 'POST' })
-    const data = await res.json()
-    window.location.href = data.url
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+        מנתח את העתיד שלך עם AI...
+      </div>
+    );
   }
 
-  if (!ai) return <div style={{padding:40}}>Loading AI...</div>
-
   return (
-    <div style={{ padding: 40, background:'#0f172a', color:'white', minHeight:'100vh' }}>
-      
-      <h1>?? Your Career Result</h1>
+    <div className="min-h-screen bg-black text-white p-8">
+      <h1 className="text-3xl mb-6 text-yellow-400">
+        התוצאות שלך 🔥
+      </h1>
 
-      <div style={{ background:'#1e293b', padding:20, borderRadius:12, marginTop:20 }}>
-        <h2>{ai.title}</h2>
-        <p>{ai.summary}</p>
-      </div>
-
-      <div style={{ position:'relative', marginTop:30, background:'#1e293b', padding:20, borderRadius:12 }}>
-        
-        <div style={{
-          filter: isPro ? 'none' : 'blur(6px)'
-        }}>
-          <h2>?? Full Career Plan</h2>
-          <ul>
-            {ai.plan.map((p:string,i:number)=>(<li key={i}>{p}</li>))}
-          </ul>
-        </div>
-
-        {!isPro && (
-          <div style={{
-            position:'absolute',
-            inset:0,
-            display:'flex',
-            flexDirection:'column',
-            justifyContent:'center',
-            alignItems:'center',
-            background:'rgba(0,0,0,0.7)'
-          }}>
-            <h2>?? Unlock Full Plan</h2>
-            <button onClick={handleUpgrade} style={{
-              marginTop:20,
-              padding:'12px 24px',
-              background:'#22c55e',
-              border:'none',
-              borderRadius:8,
-              fontWeight:'bold'
-            }}>
-              Upgrade ??
-            </button>
-          </div>
-        )}
-
+      <div className="whitespace-pre-line text-gray-300">
+        {result}
       </div>
     </div>
-  )
+  );
 }
 
 

@@ -2,43 +2,41 @@
 
 import { useEffect, useState } from "react";
 
-export default function Result() {
-  const [data, setData] = useState<any>(null);
+export default function ResultPage() {
+  const [result, setResult] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const answers = localStorage.getItem("answers");
+    const answers = JSON.parse(localStorage.getItem("answers") || "{}");
 
-    if (answers) {
-      fetch("/api/analyze", {
-        method: "POST",
-        body: answers
-      })
-        .then(res => res.json())
-        .then(setData);
-    }
+    fetch("/api/analysis", {
+      method: "POST",
+      body: JSON.stringify({ answers }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setResult(data.result);
+        setLoading(false);
+      });
   }, []);
 
-  if (!data) return <div className="text-white p-10">Analyzing...</div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+        מנתח את העתיד שלך עם AI...
+      </div>
+    );
+  }
 
-  const isPro = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('success') === 'true';
+  return (
+    <div className="min-h-screen bg-black text-white p-8">
+      <h1 className="text-3xl mb-6 text-yellow-400">
+        התוצאות שלך 🔥
+      </h1>
 
-return (
-    <div className="min-h-screen bg-black text-white p-10 space-y-6">
-      <h1 className="text-4xl">Your Career DNA</h1>
-
-      <p>{data.identity}</p>
-
-      <button
-        onClick={() => location.href="/ai-career/premium"}
-        className="mt-10 px-8 py-4 bg-yellow-400 text-black rounded-full"
-      >
-        Unlock Premium
-      </button>
+      <div className="whitespace-pre-line text-gray-300">
+        {result}
+      </div>
     </div>
   );
 }
-
-
-
-
-

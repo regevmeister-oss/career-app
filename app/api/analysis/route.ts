@@ -1,45 +1,52 @@
-import OpenAI from "openai";
+﻿import OpenAI from "openai";
 import { NextResponse } from "next/server";
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY!,
 });
 
-export async function POST() {
+export async function POST(req: Request) {
   try {
-    const completion = await openai.chat.completions.create({
+    const { answers } = await req.json();
+
+    const prompt = `
+You are a world-class career advisor AI.
+
+Analyze the following user answers and provide deep, personalized insights.
+
+User Answers:
+${JSON.stringify(answers)}
+
+Return:
+1. Personality summary
+2. Best career paths (3 options)
+3. Strengths
+4. Weaknesses
+5. Recommended next steps
+6. Ideal work environment
+
+Make it powerful, emotional, and insightful.
+`;
+
+    const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
-          role: "system",
-          content: "You are a career advisor AI. Give structured career guidance."
-        },
-        {
           role: "user",
-          content: "Give a career path with title, summary and 5 steps."
-        }
+          content: prompt,
+        },
       ],
-      temperature: 0.7,
     });
 
-    const text = completion.choices[0].message.content;
+    const result = response.choices[0].message.content;
 
-    return NextResponse.json({
-      title: "AI Career Result",
-      summary: text,
-      plan: [
-        "Step 1",
-        "Step 2",
-        "Step 3",
-        "Step 4",
-        "Step 5"
-      ]
-    });
-
-  } catch (e:any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    return NextResponse.json({ result });
+  } catch (err) {
+    return NextResponse.json(
+      { error: "AI failed" },
+      { status: 500 }
+    );
   }
 }
-
 
 
