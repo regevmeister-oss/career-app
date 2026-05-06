@@ -1,18 +1,54 @@
 import { NextResponse } from "next/server";
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const { answers } = await req.json();
 
-    const result = {
-      career: "Software Engineer",
-      reason: "Based on your answers, you fit tech & problem solving",
-    };
+    const prompt = 
+You are a world-class career advisor.
 
-    return NextResponse.json(result);
+Analyze the following user answers and return a deep career insight.
+
+User answers:
+
+
+Return JSON ONLY in this format:
+{
+  "career": "...",
+  "reason": "...",
+  "risks": "...",
+  "next_steps": ["...", "...", "..."]
+}
+;
+
+    const completion = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: "You are a career expert." },
+        { role: "user", content: prompt },
+      ],
+      temperature: 0.7,
+    });
+
+    const text = completion.choices[0].message.content;
+
+    let parsed;
+
+    try {
+      parsed = JSON.parse(text || "{}");
+    } catch {
+      parsed = { raw: text };
+    }
+
+    return NextResponse.json(parsed);
   } catch (error) {
     return NextResponse.json(
-      { error: "Something went wrong" },
+      { error: "AI failed" },
       { status: 500 }
     );
   }
