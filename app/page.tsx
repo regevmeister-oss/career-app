@@ -1,81 +1,88 @@
-'use client';
+ο»Ώ"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const router = useRouter();
-  const [showText, setShowText] = useState(false);
+
+  const [show, setShow] = useState(false);
   const [showChoices, setShowChoices] = useState(false);
+  const [text, setText] = useState("");
+
+  const fullText = ΧΧ¨Χ’Χ™Χ© ΧΧ‘Χ•Χ“?
+ΧΧ ΧΧªΧ” Χ©Χ•Χ‘ ΧΆΧ•Χ‘Χ“ Χ‘ΧΧ§Χ•Χ Χ©Χ‘Χ• ΧΧªΧ” ΧΧ ΧΧΧ•Χ©Χ¨?
+
+Χ™Χ© ΧΧ Χ• ΧΧ΅ΧΆ Χ§Χ¦Χ¨ Χ‘Χ©Χ‘Χ™ΧΧ.
+Χ¦ΧΧ™ΧΧ” ΧΧ¨Χ¦Χ•Χ Χ•Χª Χ•Χ”Χ¦Χ¨Χ›Χ™Χ Χ”ΧΧΧ™ΧªΧ™Χ™Χ Χ©ΧΧ,
+Χ‘Χ“Χ¨Χ ΧΧΧΧª Χ”ΧΧ§Χ¦Χ•ΧΆΧ™Χª Χ©ΧΧ.
+
+ΧªΧ¨Χ¦Χ” ΧΧ¦ΧΧª ΧΧΧ΅ΧΆ?;
 
   useEffect(() => {
+    // delay ΧΧ¤Χ Χ™ Χ”Χ•Χ¤ΧΆΧ”
     setTimeout(() => {
-      setShowText(true);
+      setShow(true);
 
-      setTimeout(() => {
-        setShowChoices(true);
-      }, 7000); // ζξο ςγ ωλμ δξωτθ πβξψ
-    }, 2000); // γιμιι ψΰωεπι
+      // ΧΧ¤Χ§Χ Χ›ΧªΧ™Χ‘Χ”
+      let i = 0;
+      const interval = setInterval(() => {
+        setText((prev) => prev + fullText[i]);
+        i++;
+        if (i >= fullText.length) {
+          clearInterval(interval);
+
+          // Χ”Χ•Χ¤ΧΆΧª Χ›Χ¤ΧªΧ•Χ¨Χ™Χ ΧΧ—Χ¨Χ™ ΧΧ§Χ΅Χ
+          setTimeout(() => {
+            setShowChoices(true);
+          }, 2000);
+        }
+      }, 35);
+
+    }, 2000);
   }, []);
 
-  const text = [
-    "ξψβιω ΰαεγ?",
-    "ΰν ΰϊδ ωεα ςεαγ αξχεν ωαε ΰϊδ μΰ ξΰεωψ?",
-    "ιω μπε ξρς χφψ αωαιμκ...",
-    "φμιμδ μψφεπεϊ εδφψλιν δΰξιϊιιν ωμκ",
-    "αγψκ μΰξϊ δξχφεςιϊ ωμκ.",
-    "",
-    "ϊψφδ μφΰϊ μξρς?"
-  ];
-
   return (
-    <div className="h-screen flex flex-col items-center justify-center text-center px-6 bg-black text-white">
-      
-      {showText && (
-        <div className="text-3xl md:text-5xl font-bold leading-relaxed space-y-4">
-          {text.map((line, i) => (
-            <p
-              key={i}
-              style={{
-                animation: \adeIn 1s ease forwards\,
-                animationDelay: \\s\,
-                opacity: 0
-              }}
-            >
-              {line}
-            </p>
-          ))}
-        </div>
-      )}
+    <main className="h-screen w-full flex items-center justify-center bg-black text-white overflow-hidden">
 
-      {showChoices && (
-        <div className="flex gap-6 mt-12">
-          
-          <button
-            onClick={() => router.push('/onboarding')}
-            className="w-32 h-32 rounded-full backdrop-blur-md bg-white/10 border border-white/20 hover:scale-110 transition text-lg"
+      <AnimatePresence>
+        {show && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="text-center max-w-2xl px-6"
           >
-            λο
-          </button>
+            <h1 className="text-3xl md:text-5xl font-bold leading-relaxed whitespace-pre-line">
+              {text}
+            </h1>
 
-          <button
-            onClick={() => alert('λωϊψφδ, ΰπηπε λΰο ??')}
-            className="w-32 h-32 rounded-full backdrop-blur-md bg-white/10 border border-white/20 hover:scale-110 transition text-lg"
-          >
-            μΰ
-          </button>
+            {showChoices && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex gap-6 justify-center mt-10"
+              >
+                <button
+                  onClick={() => router.push("/ai-career/onboarding/questions")}
+                  className="w-32 h-32 rounded-full backdrop-blur-lg bg-white/10 border border-white/20 hover:scale-110 transition"
+                >
+                  Χ›Χ
+                </button>
 
-        </div>
-      )}
+                <button
+                  onClick={() => alert("Χ›Χ©ΧªΧ”Χ™Χ” ΧΧ•Χ›Χ β€” ΧΧ Χ—Χ Χ• Χ›ΧΧ π’™")}
+                  className="w-32 h-32 rounded-full backdrop-blur-lg bg-white/5 border border-white/10 hover:scale-110 transition"
+                >
+                  ΧΧ
+                </button>
+              </motion.div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      <style jsx>{\
-        @keyframes fadeIn {
-          to {
-            opacity: 1;
-          }
-        }
-      \}</style>
-
-    </div>
+    </main>
   );
 }
