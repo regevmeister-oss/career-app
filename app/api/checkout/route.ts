@@ -1,8 +1,8 @@
-ï»¿import Stripe from "stripe";
+import Stripe from "stripe";
 import { NextResponse } from "next/server";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-06-20",
+  // apiVersion removed,
 });
 
 export async function POST(req: Request) {
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
       },
     ],
 
-    // ðŸ”¥ ×–×” ×”×—×™×‘×•×¨ ×œ×ž×©×ª×ž×©
+    // ?? æä äçéáåø ìîùúîù
     metadata: {
       userId,
     },
