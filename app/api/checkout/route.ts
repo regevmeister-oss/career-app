@@ -1,41 +1,30 @@
+ן»¿import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { NextResponse } from "next/server";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  // apiVersion removed,
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(req: Request) {
-  const { userId } = await req.json();
-
-  const session = await stripe.checkout.sessions.create({
-    payment_method_types: ["card"],
-    mode: "payment",
-
-    line_items: [
-      {
-        price_data: {
-          currency: "usd",
-          product_data: {
-            name: "IGUIDE PRO",
+  try {
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: "IGUIDE PRO נ€",
+            },
+            unit_amount: 500,
           },
-          unit_amount: 2000,
+          quantity: 1,
         },
-        quantity: 1,
-      },
-    ],
+      ],
+      success_url: "https://your-domain.com/success",
+      cancel_url: "https://your-domain.com/cancel",
+    });
 
-    // ?? זה החיבור למשתמש
-    metadata: {
-      userId,
-    },
-
-    success_url: "https://iguide.tech/success",
-    cancel_url: "https://iguide.tech/cancel",
-  });
-
-  return NextResponse.json({ url: session.url });
+    return NextResponse.json({ url: session.url });
+  } catch (err) {
+    return NextResponse.json({ error: "Stripe error" }, { status: 500 });
+  }
 }
-
-
-
