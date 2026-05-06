@@ -19,8 +19,8 @@ export async function POST(req: Request) {
           quantity: 1,
         },
       ],
-      success_url: "https://your-domain.com/success",
-      cancel_url: "https://your-domain.com/cancel",
+      success_url: "https://iguide.tech/.com/success",
+      cancel_url: "https://iguide.tech.com/cancel",
     });
 
     return NextResponse.json({ url: session.url });
