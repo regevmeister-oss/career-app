@@ -1,32 +1,26 @@
 "use client";
+
 import { useRouter } from "next/navigation";
 
-export default function Intro() {
+export default function AiCareerEntry() {
   const router = useRouter();
 
   return (
-    <div className="h-screen flex flex-col items-center justify-center bg-black text-white text-center px-6">
-      <h1 className="text-4xl md:text-5xl font-semibold mb-10">
-        Feeling lost in your career?
-      </h1>
+    <div className="h-screen flex items-center justify-center bg-black text-white">
+      <div className="text-center space-y-6">
+        <h1 className="text-4xl font-bold">
+          AI Career Test
+        </h1>
 
-      <p className="mb-10 text-gray-300 max-w-xl">
-        A short journey into your true career alignment.
-      </p>
+        <p className="text-gray-400">
+          Discover what career truly fits you
+        </p>
 
-      <div className="flex gap-6">
         <button
           onClick={() => router.push("/ai-career/onboarding")}
-          className="px-8 py-4 rounded-full bg-white text-black"
+          className="px-6 py-3 bg-white text-black rounded-xl"
         >
-          Yes
-        </button>
-
-        <button
-          onClick={() => router.push("/ai-career/goodbye")}
-          className="px-8 py-4 rounded-full border border-white"
-        >
-          No
+          Start Test
         </button>
       </div>
     </div>
