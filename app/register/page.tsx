@@ -1,22 +1,36 @@
-import { prisma } from "@/lib/prisma";
-import bcrypt from "bcrypt";
-import { NextResponse } from "next/server";
+"use client";
 
-export async function POST(req: Request) {
-  const { email, password } = await req.json();
+import { useState } from "react";
 
-  const hashed = await bcrypt.hash(password, 10);
+export default function RegisterPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const user = await prisma.user.create({
-    data: {
-      email,
-      password: hashed,
-    },
-  });
+  return (
+    <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center">
+      <h1 className="text-4xl font-bold text-yellow-400 mb-6">
+        Register
+      </h1>
 
-  return NextResponse.json(user);
+      <input
+        type="email"
+        placeholder="Email"
+        className="mb-4 px-4 py-2 rounded text-black"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+
+      <input
+        type="password"
+        placeholder="Password"
+        className="mb-6 px-4 py-2 rounded text-black"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+
+      <button className="bg-yellow-400 text-black px-6 py-2 rounded">
+        Create Account
+      </button>
+    </main>
+  );
 }
-
-
-
-
