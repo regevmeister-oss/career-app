@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
+import { detectProfile } from "@/lib/profile";
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -9,47 +10,46 @@ export async function POST(req: Request) {
   try {
     const { answers } = await req.json();
 
+    const profile = detectProfile(answers);
+
     const prompt = 
-You are a world-class career advisor.
+User personality type: C:\Users\user\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
 
-Analyze the following user answers and return a deep career insight.
-
-User answers:
+Answers:
 
 
-Return JSON ONLY in this format:
+Give a deep, personal career analysis.
+
+Return JSON:
 {
   "career": "...",
   "reason": "...",
   "risks": "...",
-  "next_steps": ["...", "...", "..."]
+  "next_steps": ["...", "..."],
+  "personality_insight": "..."
 }
 ;
 
     const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: "You are a career expert." },
+        { role: "system", content: "You are a deep psychological career expert." },
         { role: "user", content: prompt },
       ],
-      temperature: 0.7,
+      temperature: 0.8,
     });
 
     const text = completion.choices[0].message.content;
 
     let parsed;
-
     try {
       parsed = JSON.parse(text || "{}");
     } catch {
       parsed = { raw: text };
     }
 
-    return NextResponse.json(parsed);
-  } catch (error) {
-    return NextResponse.json(
-      { error: "AI failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ ...parsed, profile });
+  } catch (e) {
+    return NextResponse.json({ error: "AI failed" }, { status: 500 });
   }
 }

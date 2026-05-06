@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function ResultPage() {
-  const [step, setStep] = useState(0);
   const [data, setData] = useState<any>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const answers = JSON.parse(localStorage.getItem("answers") || "[]");
@@ -14,61 +15,39 @@ export default function ResultPage() {
       body: JSON.stringify({ answers }),
     })
       .then((res) => res.json())
-      .then((res) => {
-        setData(res);
-
-        // Reveal sequence
-        setTimeout(() => setStep(1), 1500);
-        setTimeout(() => setStep(2), 3500);
-        setTimeout(() => setStep(3), 5500);
-        setTimeout(() => setStep(4), 7500);
-      });
+      .then(setData);
   }, []);
 
+  if (!data) return <p className="text-white">Analyzing...</p>;
+
   return (
-    <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-6 text-center">
+    <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center text-center px-6">
 
-      {!data && (
-        <h1 className="text-2xl animate-pulse">
-          אנחנו מנתחים את האישיות שלך...
-        </h1>
-      )}
+      <h1 className="text-4xl text-yellow-400 mb-4">
+        {data.career}
+      </h1>
 
-      {data && (
-        <div className="max-w-xl space-y-6">
+      <p className="mb-6">{data.reason}</p>
 
-          {step >= 1 && (
-            <h1 className="text-4xl font-bold text-yellow-400 animate-fadeIn">
-              {data.career}
-            </h1>
-          )}
+      {/* ?? LOCK */}
+      <div className="bg-black/60 border border-yellow-400 p-6 rounded-xl max-w-xl">
 
-          {step >= 2 && (
-            <p className="text-lg text-gray-300 animate-fadeIn">
-              {data.reason}
-            </p>
-          )}
+        <p className="mb-4">
+          אנחנו רואים כאן משהו עמוק יותר…
+        </p>
 
-          {step >= 3 && (
-            <div className="bg-red-900/30 p-4 rounded-xl animate-fadeIn">
-              <h2 className="font-bold mb-2">?? מה עלול לעצור אותך</h2>
-              <p>{data.risks}</p>
-            </div>
-          )}
+        <p className="blur-sm select-none">
+          {data.personality_insight}
+        </p>
 
-          {step >= 4 && (
-            <div className="bg-green-900/30 p-4 rounded-xl animate-fadeIn">
-              <h2 className="font-bold mb-2">?? הצעדים הבאים שלך</h2>
-              <ul className="space-y-2">
-                {data.next_steps?.map((s: string, i: number) => (
-                  <li key={i}>• {s}</li>
-                ))}
-              </ul>
-            </div>
-          )}
+        <button
+          onClick={() => router.push("/pricing")}
+          className="mt-6 bg-yellow-400 text-black px-6 py-3 rounded-full"
+        >
+          Unlock Full Analysis ??
+        </button>
 
-        </div>
-      )}
+      </div>
 
     </main>
   );
