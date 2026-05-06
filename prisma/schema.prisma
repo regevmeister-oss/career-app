@@ -1,7 +1,12 @@
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  isPro     Boolean  @default(false)
-  createdAt DateTime @default(now())
+  id           String   @id @default(cuid())
+  email        String   @unique
+  password     String
+  isPro        Boolean  @default(false)
+
+  referralCode String   @unique @default(cuid())
+  referredBy   String?
+  referrals    Int      @default(0)
+
+  createdAt    DateTime @default(now())
 }
