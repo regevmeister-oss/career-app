@@ -1,51 +1,75 @@
-ן»¿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 
 export default function ResultPage() {
+  const [step, setStep] = useState(0);
   const [data, setData] = useState<any>(null);
 
   useEffect(() => {
     const answers = JSON.parse(localStorage.getItem("answers") || "[]");
 
-    fetch("/api/ai/analyze", {
+    fetch("/api/ai", {
       method: "POST",
       body: JSON.stringify({ answers }),
     })
-      .then(res => res.json())
-      .then(setData);
+      .then((res) => res.json())
+      .then((res) => {
+        setData(res);
+
+        // Reveal sequence
+        setTimeout(() => setStep(1), 1500);
+        setTimeout(() => setStep(2), 3500);
+        setTimeout(() => setStep(3), 5500);
+        setTimeout(() => setStep(4), 7500);
+      });
   }, []);
 
-  if (!data) return <div className="text-white p-10">Analyzing...</div>;
-
   return (
-    <main className="min-h-screen bg-black text-white p-10">
-      <h1 className="text-4xl font-bold mb-6">{data.personality}</h1>
+    <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-6 text-center">
 
-      <p className="mb-6">{data.message}</p>
+      {!data && (
+        <h1 className="text-2xl animate-pulse">
+          אנחנו מנתחים את האישיות שלך...
+        </h1>
+      )}
 
-      {/* FREE PART */}
-      <div className="mb-6">
-        <h2 className="text-2xl">Strengths</h2>
-        <ul>{data.strengths.map((s:any,i:number)=><li key={i}>ג” {s}</li>)}</ul>
-      </div>
+      {data && (
+        <div className="max-w-xl space-y-6">
 
-      {/* LOCKED PART */}
-      <div className="opacity-40 blur-sm">
-        <h2 className="text-2xl">Careers</h2>
-        <ul>{data.careers.map((c:any,i:number)=><li key={i}>נ’¼ {c}</li>)}</ul>
-      </div>
+          {step >= 1 && (
+            <h1 className="text-4xl font-bold text-yellow-400 animate-fadeIn">
+              {data.career}
+            </h1>
+          )}
 
-      <button
-        onClick={async () => {
-          const res = await fetch("/api/checkout", { method: "POST" });
-          const data = await res.json();
-          window.location.href = data.url;
-        }}
-        className="mt-10 px-6 py-3 bg-yellow-400 text-black rounded-xl"
-      >
-        Unlock Full Career Path נ€
-      </button>
+          {step >= 2 && (
+            <p className="text-lg text-gray-300 animate-fadeIn">
+              {data.reason}
+            </p>
+          )}
+
+          {step >= 3 && (
+            <div className="bg-red-900/30 p-4 rounded-xl animate-fadeIn">
+              <h2 className="font-bold mb-2">?? מה עלול לעצור אותך</h2>
+              <p>{data.risks}</p>
+            </div>
+          )}
+
+          {step >= 4 && (
+            <div className="bg-green-900/30 p-4 rounded-xl animate-fadeIn">
+              <h2 className="font-bold mb-2">?? הצעדים הבאים שלך</h2>
+              <ul className="space-y-2">
+                {data.next_steps?.map((s: string, i: number) => (
+                  <li key={i}>• {s}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+        </div>
+      )}
+
     </main>
   );
 }
