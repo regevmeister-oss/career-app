@@ -1,27 +1,34 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function PremiumPage() {
-  const sessionData = useSession();
+  const { data } = useSession();
+  const router = useRouter();
 
-  if (!sessionData) {
-    return null;
+  if (!data) {
+    return <p>Loading...</p>;
   }
 
-  const { data } = sessionData;
+  if (!data.user?.isPro) {
+    return (
+      <main className="min-h-screen flex flex-col items-center justify-center bg-black text-white">
+        <h1 className="text-3xl mb-6">?? Premium Locked</h1>
+
+        <button
+          onClick={() => router.push("/pricing")}
+          className="bg-yellow-400 text-black px-6 py-3 rounded-full"
+        >
+          Unlock Now
+        </button>
+      </main>
+    );
+  }
 
   return (
-    <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center">
-      <h1 className="text-4xl font-bold text-yellow-400 mb-4">
-        Premium ??
-      </h1>
-
-      {data ? (
-        <p>Welcome PRO user</p>
-      ) : (
-        <p>You are not logged in</p>
-      )}
+    <main className="min-h-screen flex items-center justify-center text-white">
+      <h1>?? Welcome PRO user</h1>
     </main>
   );
 }

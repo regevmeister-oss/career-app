@@ -19,7 +19,7 @@ export async function POST() {
         quantity: 1,
       },
     ],
-    success_url: process.env.NEXT_PUBLIC_URL + "/success",
+    customer_email: user.email, success_url: process.env.NEXT_PUBLIC_URL + "/success",
     cancel_url: process.env.NEXT_PUBLIC_URL + "/cancel",
   });
 
